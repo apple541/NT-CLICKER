@@ -5,64 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Авторизация</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        .container {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            width: 300px;
-        }
-        h1 {
-            text-align: center;
-        }
-        input[type="text"], input[type="password"] {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        button {
-            width: 100%;
-            padding: 10px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        .switch-form {
-            text-align: center;
-            margin-top: 15px;
-        }
-        .switch-form a {
-            color: #007BFF;
-            text-decoration: none;
-        }
-        .switch-form a:hover {
-            text-decoration: underline;
-        }
+        /* Стили остаются прежними */
     </style>
+    <!-- Подключаем Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js"></script>
 </head>
 <body>
     <div class="container">
         <h1>Авторизация</h1>
-
+        
         <!-- Форма регистрации -->
         <form id="register-form" onsubmit="register(event)">
-            <input type="text" id="register-username" placeholder="Имя пользователя" required>
-            <input type="password" id="register-password" placeholder="Пароль" required>
+            <label for="register-username">Имя пользователя</label>
+            <input type="text" id="register-username" required>
+            <label for="register-password">Пароль</label>
+            <input type="password" id="register-password" required>
             <button type="submit">Зарегистрироваться</button>
         </form>
 
@@ -72,8 +30,10 @@
 
         <!-- Форма входа -->
         <form id="login-form" style="display: none;" onsubmit="login(event)">
-            <input type="text" id="login-username" placeholder="Имя пользователя" required>
-            <input type="password" id="login-password" placeholder="Пароль" required>
+            <label for="login-username">Имя пользователя</label>
+            <input type="text" id="login-username" required>
+            <label for="login-password">Пароль</label>
+            <input type="password" id="login-password" required>
             <button type="submit">Войти</button>
         </form>
 
@@ -83,16 +43,38 @@
     </div>
 
     <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDDlKFWzd9phmxxd1X4ILVRA_81fWfGzL8",
+            authDomain: "nt-clicker.firebaseapp.com",
+            databaseURL: "https://nt-clicker-default-rtdb.firebaseio.com",
+            projectId: "nt-clicker",
+            storageBucket: "nt-clicker.appspot.com",
+            messagingSenderId: "453868400021",
+            appId: "1:453868400021:web:40330159023b35735e5a9c",
+            measurementId: "G-F64CW9CQPT"
+        };
+
+        // Инициализация Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
         function toggleForms() {
             const registerForm = document.getElementById('register-form');
             const loginForm = document.getElementById('login-form');
             const switchToLogin = document.querySelectorAll('.switch-form')[0];
             const switchToRegister = document.querySelectorAll('.switch-form')[1];
 
-            registerForm.style.display = registerForm.style.display === 'none' ? 'block' : 'none';
-            loginForm.style.display = loginForm.style.display === 'none' ? 'block' : 'none';
-            switchToLogin.style.display = switchToLogin.style.display === 'none' ? 'block' : 'none';
-            switchToRegister.style.display = switchToRegister.style.display === 'none' ? 'block' : 'none';
+            if (registerForm.style.display === 'none') {
+                registerForm.style.display = 'block';
+                loginForm.style.display = 'none';
+                switchToLogin.style.display = 'block';
+                switchToRegister.style.display = 'none';
+            } else {
+                registerForm.style.display = 'none';
+                loginForm.style.display = 'block';
+                switchToLogin.style.display = 'none';
+                switchToRegister.style.display = 'block';
+            }
         }
 
         function register(event) {
@@ -100,35 +82,40 @@
             const username = document.getElementById('register-username').value;
             const password = document.getElementById('register-password').value;
 
-            if (localStorage.getItem(username)) {
-                alert("Пользователь с таким именем уже существует.");
-            } else {
-                const account = { username, password, balance: 0 };
-                localStorage.setItem(username, JSON.stringify(account));
-                alert("Регистрация прошла успешно.");
-                window.location.href = 'clicker.html'; // Перенаправляем на кликер
-                localStorage.setItem('loggedInUser', username); // Сохраняем вошедшего пользователя
-            }
+            // Сохраняем данные в Firebase
+            database.ref('users/' + username).set({
+                password: password,
+                balance: 0 // Начальный баланс
+            }).then(() => {
+                alert('Регистрация прошла успешно!');
+                window.location.href = 'clicker.html'; // Перенаправление на clicker.html
+            }).catch(error => {
+                alert('Ошибка регистрации: ' + error.message);
+            });
         }
 
         function login(event) {
             event.preventDefault();
             const username = document.getElementById('login-username').value;
             const password = document.getElementById('login-password').value;
-            const storedAccount = localStorage.getItem(username);
 
-            if (storedAccount) {
-                const account = JSON.parse(storedAccount);
-                if (account.password === password) {
-                    alert("Вход выполнен.");
-                    window.location.href = 'clicker.html'; // Перенаправляем на кликер
-                    localStorage.setItem('loggedInUser', username); // Сохраняем вошедшего пользователя
+            // Проверка существования пользователя
+            database.ref('users/' + username).once('value').then(snapshot => {
+                if (snapshot.exists()) {
+                    const userData = snapshot.val();
+                    if (userData.password === password) {
+                        alert('Вход успешен!');
+                        localStorage.setItem('username', username); // Сохраняем имя пользователя в localStorage
+                        window.location.href = 'clicker.html'; // Перенаправление на clicker.html
+                    } else {
+                        alert('Неверный пароль');
+                    }
                 } else {
-                    alert("Неправильный пароль.");
+                    alert('Пользователь не найден');
                 }
-            } else {
-                alert("Пользователь не найден.");
-            }
+            }).catch(error => {
+                alert('Ошибка входа: ' + error.message);
+            });
         }
     </script>
 </body>

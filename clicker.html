@@ -7,77 +7,121 @@
     <style>
         body {
             font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
+            background-image: url('images/web.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
         }
         .container {
-            background-color: white;
+            background: rgba(255, 255, 255, 0.8);
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
             text-align: center;
-        }
-        .balance {
-            font-size: 1.5em;
-            margin-bottom: 20px;
         }
         button {
             padding: 10px 20px;
-            font-size: 1.2em;
-            cursor: pointer;
+            font-size: 1.5em;
             background-color: #4CAF50;
             color: white;
             border: none;
             border-radius: 5px;
+            cursor: pointer;
         }
         button:hover {
             background-color: #45a049;
         }
-        .ad-container {
-            margin-top: 20px;
-            text-align: center;
-            background: #f1f1f1;
-            padding: 10px;
+        .balance {
+            font-size: 2em;
+            margin: 20px 0;
+        }
+        .advertisement {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 15px;
             border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
     </style>
+    <!-- Подключаем Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js"></script>
 </head>
 <body>
     <div class="container">
-        <div class="balance">Ваш баланс: <span id="balance">0</span> монет</div>
-        <button onclick="addCoin()">КЛИКНИ</button>
-        <div class="ad-container">Лучший сервер MCBE: <b>StormPE</b></div>
+        <h1>Clicker Game</h1>
+        <div class="balance">Баланс: <span id="balance">0</span> монет</div>
+        <button onclick="addCoins()">Кликни меня!</button>
+    </div>
+
+    <div class="advertisement">
+        <h2>Лучший сервер MCBE</h2>
+        <h3>StormPE</h3>
     </div>
 
     <script>
-        let balance = 0;
-        const balanceDisplay = document.getElementById('balance');
+        // Firebase конфигурация
+        const firebaseConfig = {
+            apiKey: "AIzaSyDDlKFWzd9phmxxd1X4ILVRA_81fWfGzL8",
+            authDomain: "nt-clicker.firebaseapp.com",
+            databaseURL: "https://nt-clicker-default-rtdb.firebaseio.com",
+            projectId: "nt-clicker",
+            storageBucket: "nt-clicker.appspot.com",
+            messagingSenderId: "453868400021",
+            appId: "1:453868400021:web:40330159023b35735e5a9c",
+            measurementId: "G-F64CW9CQPT"
+        };
 
-        // Получаем данные о пользователе
-        const loggedInUser = localStorage.getItem('loggedInUser');
-        if (!loggedInUser) {
-            alert("Вы не авторизованы. Перенаправляем на страницу входа.");
-            window.location.href = 'auth.html'; // Перенаправляем на страницу авторизации
-        } else {
-            const account = JSON.parse(localStorage.getItem(loggedInUser));
-            balance = account.balance;
-            balanceDisplay.textContent = balance;
+        // Инициализация Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Получаем текущего пользователя
+        const currentUser = localStorage.getItem("currentUser");
+        if (!currentUser) {
+            alert("Пожалуйста, войдите в систему.");
+            window.location.href = "auth.html"; // Перенаправление на auth.html
         }
 
-        // Функция для добавления монет
-        function addCoin() {
-            balance++;
-            balanceDisplay.textContent = balance;
-
-            // Обновляем баланс пользователя в localStorage
-            const account = JSON.parse(localStorage.getItem(loggedInUser));
-            account.balance = balance;
-            localStorage.setItem(loggedInUser, JSON.stringify(account));
+        // Загружаем баланс из базы данных
+        function loadBalance() {
+            database.ref('users/' + currentUser).once('value').then((snapshot) => {
+                if (snapshot.exists()) {
+                    document.getElementById('balance').innerText = snapshot.val().balance;
+                }
+            }).catch((error) => {
+                console.error("Ошибка загрузки баланса: ", error);
+            });
         }
+
+        // Добавляем монеты
+        function addCoins() {
+            database.ref('users/' + currentUser).once('value').then((snapshot) => {
+                if (snapshot.exists()) {
+                    const newBalance = snapshot.val().balance + 1;
+                    database.ref('users/' + currentUser).update({
+                        balance: newBalance
+                    }).then(() => {
+                        document.getElementById('balance').innerText = newBalance;
+                    }).catch((error) => {
+                        console.error("Ошибка обновления баланса: ", error);
+                    });
+                }
+            }).catch((error) => {
+                console.error("Ошибка получения данных пользователя: ", error);
+            });
+        }
+
+        // Загрузка баланса при загрузке страницы
+        loadBalance();
     </script>
 </body>
 </html>

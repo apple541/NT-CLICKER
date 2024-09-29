@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Онлайн серверы</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url('images/web.jpg'); /* Путь к изображению */
+            background-size: cover; /* Изображение покрывает весь экран */
+            background-position: center; /* Центрируем изображение */
+            background-repeat: no-repeat; /* Не повторяем изображение */
+            height: 100vh; /* Высота страницы */
+            display: flex;
+            justify-content: center; /* Центрируем по горизонтали */
+            align-items: center; /* Центрируем по вертикали */
+            text-align: center;
+        }
+        .container {
+            display: flex; /* Используем flex для размещения контейнеров */
+            align-items: center; /* Выравниваем по центру по вертикали */
+        }
+        .server-container {
+            background: linear-gradient(to bottom, rgba(150, 150, 150, 0.9), rgba(200, 200, 200, 0.9)); /* Более серый фон */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Небольшая тень */
+            width: 80%; /* Ширина контейнера */
+            max-width: 600px; /* Максимальная ширина контейнера */
+            margin: 20px; /* Отступы */
+            transition: transform 0.3s ease; /* Плавный переход для трансформации */
+        }
+        .server-container:hover {
+            transform: scale(1.05); /* Увеличиваем размер контейнера на 5% */
+        }
+        .button-container {
+            background: linear-gradient(to bottom, rgba(150, 150, 150, 0.9), rgba(200, 200, 200, 0.9)); /* Цвет совпадает с контейнером серверов */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Небольшая тень */
+            margin: 20px; /* Отступы */
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 1.2em;
+            color: white; /* Цвет текста белый */
+            background: linear-gradient(45deg, #FF69B4, #FFD700); /* Розово-желтый градиент */
+            border: 2px solid black; /* Черная рамка */
+            border-radius: 5px;
+            text-decoration: none; /* Убираем подчеркивание */
+            transition: background 0.3s ease, color 0.3s ease; /* Плавный переход для фона и цвета */
+        }
+        .button:hover {
+            background: black; /* Фон кнопки черный при наведении */
+            color: white; /* Цвет текста белый при наведении */
+        }
+        .server-status {
+            margin-top: 20px;
+            font-size: 1.5em;
+            color: black; /* Цвет текста */
+            text-shadow: 1px 1px 2px white; /* Тень для текста */
+        }
+        .server {
+            margin-top: 20px;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+        .progress {
+            height: 100%;
+            background: #4caf50; /* Зеленый цвет для полоски */
+            width: 0%; /* Начальная ширина */
+            transition: width 0.5s ease; /* Плавное изменение ширины */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="button-container">
+            <h2>Контакты</h2>
+            <a href="https://discord.gg/ваш_дискорд" class="button" target="_blank">Дискорд</a>
+            <a href="https://t.me/ваш_телеграм" class="button" target="_blank">Телеграмм</a>
+            <a href="https://ваш_сайт.com" class="button" target="_blank">Сайт</a>
+        </div>
+        <div class="server-container">
+            <h1>Онлайн серверы</h1>
+            <div class="server-status" id="servers-list">
+                <h2>Java Edition</h2>
+                <!-- Сервера Java будут добавлены сюда динамически -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const javaServers = [
+            { ip: "mc.funtime.su", port: "25565", elementId: "online-players1", progressId: "progress1", title: "FunTime", color: "linear-gradient(45deg, #FF5E00, #FF2D00)" }, // Ярко-красный
+            { ip: "mc.holyworld.ru", port: "25565", elementId: "online-players2", progressId: "progress2", title: "HolyWorld", color: "linear-gradient(45deg, #00A2FF, #005C99)" }, // Ярко-голубой
+            { ip: "storm-pe.fun", port: "19132", elementId: "online-players3", progressId: "online-players3", title: "StormPE", color: "linear-gradient(45deg, #A0A0A0, #7D7D7D)" },  // Светло-серый
+            { ip: "wastope.fun", port: "19132", elementId: "online-players4", progressId: "progress4", title: "WastoPE", color: "linear-gradient(45deg, #0072FF, #005F99)" }, // Ярко-синий
+            { ip: "clusterpvp.ru", port: "25565", elementId: "online-players5", progressId: "progress5", title: "ClusterPVP", color: "linear-gradient(45deg, #FFD700, #FFC400)" }, // Ярко-желтый
+            { ip: "mc.gulpvp.pw", port: "25565", elementId: "online-players6", progressId: "progress6", title: "GulPVP", color: "linear-gradient(45deg, #4CAF50, #3E8E41)" }, // Ярко-зеленый
+            { ip: "mc.space-times.ru", port: "25565", elementId: "online-players7", progressId: "progress7", title: "SpaceTimes", color: "linear-gradient(45deg, #A97BC0, #BF5C8D)" }, // Ярко-фиолетовый
+            { ip: "SpookyTime.net", port: "25565", elementId: "online-players8", progressId: "progress8", title: "SpookyTime", color: "linear-gradient(45deg, #9B59B6, #8E44AD)" }  // Ярко-фиолетово-синий
+        ];
+
+        const fetchOnlinePlayers = (server) => {
+            return fetch(`https://mcapi.us/server/status?ip=${server.ip}&port=${server.port}`)
+                .then(response => response.json())
+                .then(data => {
+                    const onlinePlayers = data.online ? data.players.now : 0; // Количество игроков онлайн
+                    return { ...server, onlinePlayers }; // Возвращаем сервер с количеством онлайн игроков
+                })
+                .catch(error => {
+                    console.error("Ошибка:", error);
+                    return { ...server, onlinePlayers: -1 }; // Сервер оффлайн
+                });
+        };
+
+        const updateServersList = (serversData) => {
+            const serversListElement = document.getElementById("servers-list");
+            serversListElement.innerHTML = ""; // Очищаем предыдущий список
+
+            // Сортируем серверы по количеству онлайн игроков
+            serversData.sort((a, b) => b.onlinePlayers - a.onlinePlayers);
+
+            serversData.forEach(server => {
+                const serverDiv = document.createElement("div");
+                serverDiv.classList.add("server");
+                serverDiv.innerHTML = `
+                    <span style="background: ${server.color}; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                        ${server.title}
+                    </span>: Онлайн: <span id="${server.elementId}">${server.onlinePlayers >= 0 ? server.onlinePlayers : "Сервер оффлайн"}</span> игроков
+                    <div class="progress-bar">
+                        <div class="progress" id="${server.progressId}" style="width: ${server.onlinePlayers >= 0 ? Math.min(server.onlinePlayers * 10, 100) + "%" : "0px"};"></div>
+                    </div>
+                `;
+                serversListElement.appendChild(serverDiv);
+            });
+        };
+
+        // Первоначальные запросы для Java серверов
+        Promise.all(javaServers.map(fetchOnlinePlayers)).then(updateServersList);
+
+        // Обновляем количество игроков каждые 30 секунд
+        setInterval(() => {
+            Promise.all(javaServers.map(fetchOnlinePlayers)).then(updateServersList);
+        }, 30000);
+    </script>
+</body>
+</html>

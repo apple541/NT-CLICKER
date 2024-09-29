@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Авторизация</title>
+    <style>
+        /* Твой код для стилей */
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Авторизация</h1>
+        
+        <!-- Форма регистрации -->
+        <form id="register-form" onsubmit="register(event)">
+            <label for="register-username">Имя пользователя</label>
+            <input type="text" id="register-username" required>
+
+            <label for="register-password">Пароль</label>
+            <input type="password" id="register-password" required>
+
+            <button type="submit">Зарегистрироваться</button>
+        </form>
+
+        <div class="switch-form">
+            <span>Уже есть аккаунт? <a href="#" onclick="toggleForms()">Войти</a></span>
+        </div>
+
+        <!-- Форма входа -->
+        <form id="login-form" style="display: none;" onsubmit="login(event)">
+            <label for="login-username">Имя пользователя</label>
+            <input type="text" id="login-username" required>
+
+            <label for="login-password">Пароль</label>
+            <input type="password" id="login-password" required>
+
+            <button type="submit">Войти</button>
+        </form>
+
+        <div class="switch-form" style="display: none;">
+            <span>Нет аккаунта? <a href="#" onclick="toggleForms()">Зарегистрироваться</a></span>
+        </div>
+    </div>
+
+    <script>
+        function toggleForms() {
+            const registerForm = document.getElementById('register-form');
+            const loginForm = document.getElementById('login-form');
+            const switchToLogin = document.querySelectorAll('.switch-form')[0];
+            const switchToRegister = document.querySelectorAll('.switch-form')[1];
+
+            if (registerForm.style.display === 'none') {
+                registerForm.style.display = 'block';
+                loginForm.style.display = 'none';
+                switchToLogin.style.display = 'block';
+                switchToRegister.style.display = 'none';
+            } else {
+                registerForm.style.display = 'none';
+                loginForm.style.display = 'block';
+                switchToLogin.style.display = 'none';
+                switchToRegister.style.display = 'block';
+            }
+        }
+
+        // Функция для регистрации
+        function register(event) {
+            event.preventDefault();
+            const username = document.getElementById('register-username').value;
+            const password = document.getElementById('register-password').value;
+
+            const user = {username: username, password: password, balance: 0};
+
+            // Сохраняем данные пользователя в localStorage
+            if (localStorage.getItem(username)) {
+                alert('Пользователь с таким именем уже существует!');
+            } else {
+                localStorage.setItem(username, JSON.stringify(user));
+                alert('Регистрация успешна!');
+                window.location.href = "clicker.html"; // Перенаправляем на страницу clicker
+            }
+        }
+
+        // Функция для входа
+        function login(event) {
+            event.preventDefault();
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+
+            const storedUser = JSON.parse(localStorage.getItem(username));
+
+            if (storedUser && storedUser.password === password) {
+                alert('Вход успешен!');
+                localStorage.setItem('currentUser', username); // Сохраняем текущего пользователя
+                window.location.href = "clicker.html"; // Перенаправляем на страницу clicker
+            } else {
+                alert('Неверное имя пользователя или пароль');
+            }
+        }
+    </script>
+</body>
+</html>

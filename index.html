@@ -5,21 +5,64 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Авторизация</title>
     <style>
-        /* Твой код для стилей */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        h1 {
+            text-align: center;
+        }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .switch-form {
+            text-align: center;
+            margin-top: 15px;
+        }
+        .switch-form a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+        .switch-form a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Авторизация</h1>
-        
+
         <!-- Форма регистрации -->
         <form id="register-form" onsubmit="register(event)">
-            <label for="register-username">Имя пользователя</label>
-            <input type="text" id="register-username" required>
-
-            <label for="register-password">Пароль</label>
-            <input type="password" id="register-password" required>
-
+            <input type="text" id="register-username" placeholder="Имя пользователя" required>
+            <input type="password" id="register-password" placeholder="Пароль" required>
             <button type="submit">Зарегистрироваться</button>
         </form>
 
@@ -29,12 +72,8 @@
 
         <!-- Форма входа -->
         <form id="login-form" style="display: none;" onsubmit="login(event)">
-            <label for="login-username">Имя пользователя</label>
-            <input type="text" id="login-username" required>
-
-            <label for="login-password">Пароль</label>
-            <input type="password" id="login-password" required>
-
+            <input type="text" id="login-username" placeholder="Имя пользователя" required>
+            <input type="password" id="login-password" placeholder="Пароль" required>
             <button type="submit">Войти</button>
         </form>
 
@@ -50,51 +89,45 @@
             const switchToLogin = document.querySelectorAll('.switch-form')[0];
             const switchToRegister = document.querySelectorAll('.switch-form')[1];
 
-            if (registerForm.style.display === 'none') {
-                registerForm.style.display = 'block';
-                loginForm.style.display = 'none';
-                switchToLogin.style.display = 'block';
-                switchToRegister.style.display = 'none';
-            } else {
-                registerForm.style.display = 'none';
-                loginForm.style.display = 'block';
-                switchToLogin.style.display = 'none';
-                switchToRegister.style.display = 'block';
-            }
+            registerForm.style.display = registerForm.style.display === 'none' ? 'block' : 'none';
+            loginForm.style.display = loginForm.style.display === 'none' ? 'block' : 'none';
+            switchToLogin.style.display = switchToLogin.style.display === 'none' ? 'block' : 'none';
+            switchToRegister.style.display = switchToRegister.style.display === 'none' ? 'block' : 'none';
         }
 
-        // Функция для регистрации
         function register(event) {
             event.preventDefault();
             const username = document.getElementById('register-username').value;
             const password = document.getElementById('register-password').value;
 
-            const user = {username: username, password: password, balance: 0};
-
-            // Сохраняем данные пользователя в localStorage
             if (localStorage.getItem(username)) {
-                alert('Пользователь с таким именем уже существует!');
+                alert("Пользователь с таким именем уже существует.");
             } else {
-                localStorage.setItem(username, JSON.stringify(user));
-                alert('Регистрация успешна!');
-                window.location.href = "clicker.html"; // Перенаправляем на страницу clicker
+                const account = { username, password, balance: 0 };
+                localStorage.setItem(username, JSON.stringify(account));
+                alert("Регистрация прошла успешно.");
+                window.location.href = 'clicker.html'; // Перенаправляем на кликер
+                localStorage.setItem('loggedInUser', username); // Сохраняем вошедшего пользователя
             }
         }
 
-        // Функция для входа
         function login(event) {
             event.preventDefault();
             const username = document.getElementById('login-username').value;
             const password = document.getElementById('login-password').value;
+            const storedAccount = localStorage.getItem(username);
 
-            const storedUser = JSON.parse(localStorage.getItem(username));
-
-            if (storedUser && storedUser.password === password) {
-                alert('Вход успешен!');
-                localStorage.setItem('currentUser', username); // Сохраняем текущего пользователя
-                window.location.href = "clicker.html"; // Перенаправляем на страницу clicker
+            if (storedAccount) {
+                const account = JSON.parse(storedAccount);
+                if (account.password === password) {
+                    alert("Вход выполнен.");
+                    window.location.href = 'clicker.html'; // Перенаправляем на кликер
+                    localStorage.setItem('loggedInUser', username); // Сохраняем вошедшего пользователя
+                } else {
+                    alert("Неправильный пароль.");
+                }
             } else {
-                alert('Неверное имя пользователя или пароль');
+                alert("Пользователь не найден.");
             }
         }
     </script>

@@ -7,95 +7,76 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4; /* Светлый фон */
-            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
         }
         .container {
-            display: flex;
-            justify-content: space-between; /* Пространство между контейнерами */
-            align-items: center;
-            width: 80%; /* Ширина контейнера */
-            max-width: 1200px; /* Максимальная ширина */
-        }
-        .clicker-container {
-            background-color: #fff; /* Белый фон */
+            background-color: white;
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Легкая тень */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             text-align: center;
-            width: 50%;
         }
         .balance {
-            font-size: 2em;
+            font-size: 1.5em;
             margin-bottom: 20px;
         }
-        .click-button {
-            font-size: 1.5em;
+        button {
             padding: 10px 20px;
-            background-color: #4CAF50; /* Зеленый фон */
+            font-size: 1.2em;
+            cursor: pointer;
+            background-color: #4CAF50;
             color: white;
             border: none;
             border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
         }
-        .click-button:hover {
-            background-color: #45a049; /* Более темный зеленый */
-        }
-        .coin {
-            margin-top: 15px;
-            color: gold;
-            font-size: 1.2em;
+        button:hover {
+            background-color: #45a049;
         }
         .ad-container {
-            background-color: #fff; /* Белый фон */
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Легкая тень */
-            width: 30%;
+            margin-top: 20px;
             text-align: center;
-        }
-        .ad-title {
-            font-size: 1.5em;
-            margin-bottom: 15px;
-            color: #FF5722; /* Ярко-оранжевый цвет */
-        }
-        .ad-server {
-            font-size: 1.2em;
-            color: #00BCD4; /* Яркий голубой цвет */
+            background: #f1f1f1;
+            padding: 10px;
+            border-radius: 10px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="clicker-container">
-            <div class="balance">Баланс: <span id="balance">0</span> монет</div>
-            <button class="click-button" onclick="addCoin()">КЛИКНИ</button>
-            <div class="coin" id="coin-msg"></div>
-        </div>
-
-        <div class="ad-container">
-            <div class="ad-title">Лучший сервер MCBE</div>
-            <div class="ad-server">StormPE</div>
-        </div>
+        <div class="balance">Ваш баланс: <span id="balance">0</span> монет</div>
+        <button onclick="addCoin()">КЛИКНИ</button>
+        <div class="ad-container">Лучший сервер MCBE: <b>StormPE</b></div>
     </div>
 
     <script>
         let balance = 0;
+        const balanceDisplay = document.getElementById('balance');
 
+        // Получаем данные о пользователе
+        const loggedInUser = localStorage.getItem('loggedInUser');
+        if (!loggedInUser) {
+            alert("Вы не авторизованы. Перенаправляем на страницу входа.");
+            window.location.href = 'auth.html'; // Перенаправляем на страницу авторизации
+        } else {
+            const account = JSON.parse(localStorage.getItem(loggedInUser));
+            balance = account.balance;
+            balanceDisplay.textContent = balance;
+        }
+
+        // Функция для добавления монет
         function addCoin() {
             balance++;
-            document.getElementById('balance').textContent = balance;
-            const coinMsg = document.getElementById('coin-msg');
-            coinMsg.textContent = "+1 монетка!";
-            setTimeout(() => {
-                coinMsg.textContent = "";
-            }, 1000);
+            balanceDisplay.textContent = balance;
+
+            // Обновляем баланс пользователя в localStorage
+            const account = JSON.parse(localStorage.getItem(loggedInUser));
+            account.balance = balance;
+            localStorage.setItem(loggedInUser, JSON.stringify(account));
         }
     </script>
 </body>
